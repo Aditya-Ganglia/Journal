@@ -4,6 +4,8 @@ import com.aditya.journal.Service.JournalEnrtyService;
 import com.aditya.journal.entity.JournalEntry;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -30,9 +32,12 @@ public class JournalEntryControllerV2 {
         return  true;
     }
     @GetMapping("/get_by_id/{myId}")
-    public JournalEntry getById(@PathVariable ObjectId myId){
-        return journalEnrtyService.findById(myId).orElse(null);
+    public ResponseEntity<JournalEntry> getById(@PathVariable ObjectId myId) {
+        return journalEnrtyService.findById(myId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
     @PutMapping("/update/{myId}")
     public JournalEntry updateEntry(@PathVariable ObjectId myId ,@RequestBody JournalEntry newEntry){
     JournalEntry old = journalEnrtyService.findById(myId).orElse(null);
